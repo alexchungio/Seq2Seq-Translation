@@ -23,8 +23,8 @@ if __name__ == "__main__":
     input_tensor, target_tensor = load_dataset(cfgs.DATASET_PATH, num_examples)
 
     # Calculate max_length of the target tensors
-    # max_length_input, max_length_target,  = input_tensor.shape[1], target_tensor.shape[1]
-    #
+    max_length_input, max_length_target  = input_tensor.shape[1], target_tensor.shape[1]
+
     # print('Input max length {}'.format(max_length_input))
     # print('Target max length {}'.format(max_length_target))
     # # Creating training and validation sets using an 80-20 split
@@ -92,7 +92,6 @@ if __name__ == "__main__":
                                      encoder=encoder,
                                      decoder=decoder)
 
-
     @tf.function
     def train_step(inp, targ, enc_hidden):
         loss = 0
@@ -143,7 +142,7 @@ if __name__ == "__main__":
                                                              batch_loss.numpy()))
         # saving (checkpoint) the model every 2 epochs
         if (epoch + 1) % 2 == 0:
-            checkpoint.save(file_prefix=checkpoint_prefix)
+            checkpoint.save(file_prefix=checkpoint_prefix.format(epoch))
 
         print('Epoch {} Loss {:.4f}'.format(epoch + 1,
                                             total_loss / steps_per_epoch))

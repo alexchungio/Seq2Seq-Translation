@@ -12,17 +12,13 @@
 
 import unicodedata
 import re   # https://regex101.com/
-import numpy as np
-import os
 import io
-import time
-import json
 import tensorflow as tf
 import pickle
 from sklearn.model_selection import train_test_split
 
 from libs.configs import cfgs
-import pickle
+
 
 
 # Converts the unicode file to ascii
@@ -84,8 +80,15 @@ def load_dataset(path, num_examples=None):
     input_tokenizer, input_sequence = tokenize(input_lang)
     target_tokenizer, target_sequence = tokenize(target_lang)
 
-    save_word_index(cfgs.INPUT_WORD_INDEX, input_tokenizer.word_index)
-    save_word_index(cfgs.TARGET_WORD_INDEX, target_tokenizer.word_index)
+    save_to_pickle(cfgs.INPUT_WORD_INDEX, input_tokenizer.word_index)
+    save_to_pickle(cfgs.TARGET_WORD_INDEX, target_tokenizer.word_index)
+
+    seq_max_length = {
+        'input_max_length': input_sequence.shape[-1],
+        'target_max_length': target_sequence.shape[-1]
+    }
+    save_to_pickle(cfgs.SEQ_MAX_LENGTH, seq_max_length)
+
 
     return input_sequence, target_sequence
 
@@ -106,15 +109,15 @@ def dataset_batch(input, target, batch_size, epoch=None, shuffle=None):
 
     dataset = dataset.repeat(epoch).batch(batch_size, drop_remainder=True)
 
-    return iter(dataset)
+    return dataset
 
 
-def save_word_index(filename, vocab):
+def save_to_pickle(filename, vocab):
     with open(filename, 'wb') as f:
         pickle.dump(vocab, f)
 
 
-def read_word_index(filename):
+def read_from_pickle(filename):
     with open(filename, 'rb') as f:
         vocab = pickle.load(f)
         return vocab
@@ -130,7 +133,6 @@ def word_to_index(text, word_index):
     tensor = [word_index[t] for t in text]
 
     return tensor
-
 
 
 if __name__ == "__main__":
@@ -188,8 +190,8 @@ if __name__ == "__main__":
     # print(len(input_tensor_train), len(target_tensor_train), len(input_tensor_val), len(target_tensor_val))
 
     # get word_index and index word
-    input_word_index = read_word_index(cfgs.INPUT_WORD_INDEX)
-    target_word_index = read_word_index(cfgs.TARGET_WORD_INDEX)
+    input_word_index = read_from_pickle(cfgs.INPUT_WORD_INDEX)
+    target_word_index = read_from_pickle(cfgs.TARGET_WORD_INDEX)
 
     input_index_word = {index:word for word, index in input_word_index.items()}
     target_index_word = {index: word for word, index in target_word_index.items()}
@@ -202,11 +204,9 @@ if __name__ == "__main__":
     # for index, word in zip(target_tensor_train[0], index_to_word(target_tensor_train[0], target_index_word).split()):
     #     print("%d ----> %s" % (index, word))
 
-
-
     train_dataset = dataset_batch(input=input_tensor_train, target=target_tensor_train, batch_size=cfgs.BATCH_SIZE,
                                   shuffle=True)
-    example_input_batch, example_output_batch = next(train_dataset)
+    example_input_batch, example_output_batch = next(iter(train_dataset))
     print(example_input_batch.shape, example_output_batch.shape)
 
 

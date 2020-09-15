@@ -64,6 +64,7 @@ EVALUATE_DIR = ROOT_PATH + '/outputs/evaluate_result'
 
 INPUT_WORD_INDEX = ROOT_PATH + '/outputs/input_word_index.pickle'
 TARGET_WORD_INDEX = ROOT_PATH + '/outputs/target_word_index.pickle'
+SEQ_MAX_LENGTH = ROOT_PATH + '/outputs/seq_max_length.pickle'
 
 #----------------------Data---------------------
 DATASET_PATH = os.path.join(ROOT_PATH, 'data', 'spa-eng', 'spa.txt')
@@ -77,13 +78,13 @@ VOCAB_SIZE = 26
 EMBEDDING_DIM = 256
 
 # NUM_UNITS = [128, 64, 32]
-NUM_UNITS = [1024]
-NUM_LAYERS = 1
+NUM_UNITS = 1024
+
 
 #-------------------------train config-------------------------------
 EMBEDDING_TRANSFER = False
 LEARNING_RATE = 0.001
-NUM_EPOCH = 20
+NUM_EPOCH = 10
 KEEP_PROB = 1.0
 
 # data
