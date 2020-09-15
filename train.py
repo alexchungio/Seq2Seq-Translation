@@ -13,7 +13,7 @@ import os
 import tensorflow as tf
 import time
 
-from data.dataset_pipeline import load_dataset, split_dataset, dataset_batch, read_word_index
+from data.dataset_pipeline import load_dataset, split_dataset, dataset_batch, read_from_pickle
 from libs.configs import cfgs
 from libs.nets.model import Encoder, Decoder, BahdanauAttention
 
@@ -35,23 +35,23 @@ if __name__ == "__main__":
     # print(len(input_tensor_train), len(target_tensor_train), len(input_tensor_val), len(target_tensor_val))
 
     # get word_index and index word
-    input_word_index = read_word_index(cfgs.INPUT_WORD_INDEX)
-    target_word_index = read_word_index(cfgs.TARGET_WORD_INDEX)
-
+    input_word_index = read_from_pickle(cfgs.INPUT_WORD_INDEX)
+    target_word_index = read_from_pickle(cfgs.TARGET_WORD_INDEX)
+    #
     input_index_word = {index: word for word, index in input_word_index.items()}
     target_index_word = {index: word for word, index in target_word_index.items()}
 
     vocab_size_input = len(input_index_word)
     vocab_size_target = len(target_index_word)
-
+    #
     train_dataset = dataset_batch(input=input_tensor_train, target=target_tensor_train, batch_size=cfgs.BATCH_SIZE,
                                   shuffle=True)
-    # example_input_batch, example_output_batch = next(train_dataset)
-    #
+    # example_input_batch, example_output_batch = next(iter(train_dataset))
+    # #
     encoder = Encoder(batch_size=cfgs.BATCH_SIZE, vocab_size=vocab_size_input, embedding_dim=cfgs.EMBEDDING_DIM,
                       encode_units=cfgs.NUM_UNITS)
-
-    # # sample input
+    #
+    # # # sample input
     # sample_hidden = encoder.initialize_hidden_state()
     #
     # sample_output, sample_hidden = encoder(example_input_batch, sample_hidden)
